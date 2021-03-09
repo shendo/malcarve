@@ -23,18 +23,18 @@ Install using ``pip``: ::
 
 	pip install malcarve
 
-Command-line usage:
+Command-line usage: ::
 
 	malcarve [--extract [--output-dir <output_dir>]] <file1> <file2> ...
 
 
-Example Webservice:
+Example Webservice: ::
 
 	malcarve-web [-H <interface_address>] [-p port_number]
 
 
-Config can be updated by copying _malcarve/conf/malcarve.conf_ to
-_~/.malcarve/malcarve.conf_ and changing settings as desired.
+Config can be updated by copying malcarve/conf/malcarve.conf to
+~/.malcarve/malcarve.conf and changing settings as desired.
 
 
 History
