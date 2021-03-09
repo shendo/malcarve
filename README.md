@@ -46,10 +46,10 @@ which were commonly being exploited at the time.
 
 After needing a similar capability again recently, I've started reviving the
 code (it's still a bit of a mess) along with migrating to python3.  This also
-comes a with newer focus towards macro'ed documents and embedded urls/other
+comes with a newer focus towards macro'ed documents and embedded urls/other
 file types and obfuscation techniques.
 
-This is a work in progress but I've decided to release the code in the hope
+This is still a work in progress but has been released in the hope
 that others may find it useful (no warranty given or implied).
 
 
