@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="page-header">
+        <h3>API Documentation</h3>
+        <p>
+        The malcarve API is currently implemented as a blocking, synchronous HTTP POST.
+        </p>
+        <div class="overview">
+        <table class="table table-striped table-bordered">
+        	<thead>
+        		<tr>
+        			<th>URL</th>
+        			<th>Method</th>
+        			<th style="width: 25%;">Description</th>
+        			<th>Successful Response</th>
+        			<th>Unsuccessful Response</th>
+        		</tr>
+        	</thead>
+        	<tbody>
+        		<tr>
+        			<td>/api/submit</td>
+        			<td>POST</td>
+        			<td>Accepts a multipart/form-data submission containing the sample
+        				file to scan and returns a results json dictionary.
+        			</td>
+        			<td>
+        				{"apiversion": "version",<br/>
+        				 "status": "Success",<br/> 
+        				 "filename": "filename"<br/>
+        				 "filesize": bytes,<br/>
+        				 "md5": "hexstring", <br/> 
+        				 "start": "YYYY-MM-DDTHH:mm:SS.sssssss",<br/>
+        				 "finish": "YYYY-MM-DDTHH:mm:SS.sssssss",<br/> 
+        				 "duration": seconds,<br/>
+        				 "carved": [<br/>
+        				 	{"pattern": "matched pattern as escaped string",<br/>
+            				 "key": "key in hex",<br/>
+            				 "keysize": bytes,<br/>
+            				 "offset": offset in bytes,<br/>
+            				 "scheme": "obfuscation scheme",<br/>
+					 "modifiers":<br/>
+            			   		{"modifier_key": "modifier_value",<br/>
+            			 	  	...<br/>
+            				 	},<br/>
+            				 "payload": "payload type carved",<br/>
+            				 "content": "base64 of carved content",<br/>
+            			 	 "length": bytes,<br/>
+            				 "content_with_overlay": "base64 of carved content including overlay",<br/>
+            			 	 "length_with_overlay": bytes,<br/>
+            				},<br/>
+            				...<br/>
+            			]}<br/>
+        			</td>
+        			<td>
+        				{"apiversion": "version",<br/>
+        				 "status": "Failure",<br/> 
+        				 "filename": "filename"<br/>
+        				 "filesize": bytes,<br/>
+        				 "md5": "hexstring", <br/> 
+        				 "start": "YYYY-MM-DDTHH:mm:SS.sssssss",<br/>
+        				 "finish": "YYYY-MM-DDTHH:mm:SS.sssssss",<br/> 
+        				 "duration": seconds,<br/>
+        				 "carved": [],<br/>
+        				 "error": "exception message",<br/>
+            			}<br/>
+        			</td>
+        		</tr>
+        	</tbody>
+        </table> 
+        </div>
+        <h3>Example</h3>
+        <pre>
+curl -i --form file=@xor_xf00d_countup3_nulls_embedded http://localhost:8080/api/submit
+HTTP/1.0 200 OK
+Date: Sun, 18 Dec 2015 08:58:17 GMT
+Server: WSGIServer/0.1 Python/2.7.6
+Content-Length: 42407
+Content-Type: application/json
+
+{
+    "status": "Success",
+    "started": "2015-12-18T08:58:17.466162",
+    "apiversion": "0.1",
+    "filename": "xor_xf00d_countup3_nulls_embedded",
+    "filesize": 32009,
+    "md5": "6833092570b32cf92fbd8ce4ca181683",
+    "finished": "2015-12-18T08:58:17.495110",
+    "duration": 0.028948,
+    "carved": [
+        {
+            "modifiers": {
+                "step": 3,
+                "null_preserve": true
+            },
+            "pattern": "\x0e\x1f\xba\x0e\x00\xb4\t\xcd!\xb8\x01L\xcd!This program cannot",
+            "content": "TVqQAAMAAAAEAAAA//8AALgAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA...",
+            "length": 31232,
+            "keysize": 2,
+            "key": "0xf00d",
+            "offset": "0x00000309",
+            "scheme": "xor",
+            "payload_type": "pe"
+        }
+    ]
+}
+		</pre>
+	</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+include README.rst
+include LICENSE
+include requirements.txt
+include malcarve/conf/**
+include malcarve/ext/**
+include malcarve/ext/include/**
+include malcarve/ext/src/**
+include malcarve/ext/lib/*/*/**
+recursive-include malcarve/html *

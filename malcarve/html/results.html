@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="results">
+        <div class="page-header">
+            <h3>Results</h3>
+        </div>
+        <div class="overview">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Filename</th>
+                    <th>File Size</th>
+                    <th>MD5</th>
+                    <th>Processing Start</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                	<td>{{filename}}</td>
+                	<td>{{filesize|filesizeformat}}</td>
+                	<td>{{md5}}</td>
+                	<td>{{start}}</td>
+                	<td>{{duration}}</td>
+                	<td>{{status}}</td>
+                </tr>
+			</tbody>
+		</table>        	
+        </div>
+		{% if error %}
+		<div class="alert alert-danger">{{error}}</div>
+		{% endif %}
+		<div class="tab-content">
+			<div class="panel panel-primary analysis">
+	        <table class="table table-striped table-bordered">
+	            <thead>
+	                <tr>
+	                    <th>Offset</th>
+	                    <th>Stream Type</th>
+	                    <th>Stream Offset</th>
+	                    <th>Obfuscation</th>
+	                    <th>Modifiers</th>
+	                    <th>Key</th>
+	                    <th>Type</th>
+	                    <th>Size</th>
+	                    <th>Content</th>
+	                </tr>
+	            </thead>
+	            <tbody>
+			{% for carve in carved %}
+	                <tr>
+	                    <td>{{"0x%08x"|format(carve.offset)}}</td>
+	                    <td>
+	                    {% if carve.encoding %}
+	                    	{{carve.encoding}}
+	                    {% else %}
+	                    -
+	                    {% endif %}
+	                    </td>
+			    <td>
+	                    {% if carve.stream_offset %}
+	                    	{{"0x%08x"|format(carve.stream_offset)}}
+	                    {% else %}
+	                    -
+	                    {% endif %}
+	                    </td>
+	                    <td>
+	                    	{{carve.scheme}}
+	                    </td>
+	                    <td>
+	                    	{% if carve.modifiers %}
+	                    	    {% for key, value in carve.modifiers.items() %}
+	                    	    	{{key}}:&nbsp;{{value}}
+	                    	    {% if not loop.last %}
+	                    	    	<br/>
+	                    	    {% endif %}
+	                    	    {% endfor %}
+	                    	{% else %}
+	                    	-
+	                    	{% endif %}
+	                    </td>
+	                    <td>{{carve.key or "-"}}</td>
+	                    <td>{{carve.payload_type}}</td>
+	                    <td>{{carve.length|filesizeformat}}</td>
+	                    <td>
+                                {% if carve.payload_type in ("url", "useragent") %}
+                                    <pre><code>{{ carve.content | b64decode | utf8decode }}</code></pre>
+                                {% else %}
+                                    {% if carve.content %}
+                                            <a href="data:application/octet-stream;base64,{{carve.content}}"
+                                            target: "_blank"
+                                            download="{{carve.content_filename}}">Download file</a>
+                                    {% endif %}
+                                    {% if carve.content_with_overlay %}
+                                            <br/><a href="data:application/octet-stream;base64,{{carve.content_with_overlay}}"
+                                            target: "_blank"
+                                            download="{{carve.content_with_overlay_filename}}">Download with overlay</a>
+                                    {% endif %}
+                                {% endif %}
+	                    </td>
+	                </tr>
+	            {% else %}
+	            <tr><td colspan="9">No Embedded Objects Found</td></tr>
+	            {% endfor %}
+	            </tbody>
+	        </table>
+	        <i>Warning: Treat any extracted objects as malicious. Download/handle with caution.</i>
+	        </div>
+	        </div>
+	    </div>
+{% endblock %}
