@@ -20,6 +20,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import binascii
+from hashlib import md5
 import importlib
 from itertools import chain
 import os
@@ -118,6 +119,8 @@ class Scanner(object):
 
         for d in self.decoders.values():
             for s in d.decode(stream['stream'], self.get_stream_encodings(stream)):
+                if all((x == s['stream'][0] for x in s['stream'])):
+                    continue
                 s['parent'] = stream
                 yield s
                 for sub in self.get_streams(s, depth+1):
@@ -166,21 +169,23 @@ class Scanner(object):
             it = self.get_streams(buf)
 
         for stream in it:
-            # print("Stream Encoding %s %s %s" % (stream['stream_id'], self.get_stream_encodings(stream) or 'none', stream['stream'][:50]))
+            #print("Stream Encoding %s %s %d %s" % (stream['stream_id'], self.get_stream_encodings(stream) or 'none', len(stream['stream']), stream['stream'][:50]))
             for p in self.payloads.values():
                 for res in chain(self.check_stream_plaintext(p, stream), p.deob(stream['stream'])):
+
                     # only include if deemed 'interesting'
                     if self.embedded_only and not res['offset'] \
                         and not stream['encoding'] \
                         and res['scheme'] == 'plain':
                         continue
+                    h = md5(res['content']).hexdigest()
                     if stream['encoding']:
                         res['encoding'] = self.get_stream_encodings(stream)
                         res['stream_offset'] = res['offset']
                         res['offset'] = stream['offset']
                         res['stream_id'] = stream['stream_id']
                     dedupe_key = (res['scheme'], res['key'], stream['encoding'],
-                        res.get('stream_id'), res.get('stream_offset'), res['offset'])
+                        res.get('stream_offset'), res['offset'], h)
                     if dedupe_key in dedupe:
                         continue
                     # ignore no-op encoding of hex/reverse/rol4

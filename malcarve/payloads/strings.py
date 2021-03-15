@@ -56,6 +56,8 @@ class URLValidator(object):
         b"/repository0",
         b"/rpa0",
         b"/ts0",
+        # happens with add encoding list of urls (comma gets translated)
+        b"+",
     )
 
     def __init__(self, checks):

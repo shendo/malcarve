@@ -29,4 +29,7 @@ def test_findadd():
         {'offset': 0, 'scheme': 'add', 'key': b'\x01', 'keysize': 1, 'modifiers': {}}
     assert add.findadd(b'asdfr221\x01\x02\x03\x04', b'\x00\x01\x02\x03', 0) == \
         {'offset': 8, 'scheme': 'add', 'key': b'\x01', 'keysize': 1, 'modifiers': {}}
+    assert add.findadd(b'\x53\x00\x48\x00\x58\x00\x40\xa9\xad\xa9\xa9\xa9\xa8\xa8\xa9', b'\xaaW\x9fW\xafW\x97\x00\x04\x00\x00\x00\xff', 0) == \
+        {'offset': 0, 'scheme': 'add', 'key': b'\xa9', 'keysize': 1, 'modifiers': {}}
+
 

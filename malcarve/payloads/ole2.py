@@ -33,6 +33,8 @@ class OLEValidator(object):
         """
         Parse and determine end of ole compound file.
         """
+        if not buf.startswith(b'\xd0\xcf\x11\xe0'):
+            return -1, -1
         try:
             ole = olefile.OleFileIO(buf)
             eof = ole.nb_sect * ole.sector_size

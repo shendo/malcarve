@@ -42,6 +42,7 @@ class DeflateDecoder(object):
             rb'|(\xc4\x54)|(\xc4\x53)|(\x84\xd0)|(\x9d\x54)|(\xcc\x58)|(\xac\x95)' +
             rb'|(\x8c\x92)|(\xc4\x96))'
         )
+        self.min_size = 12
 
     def decode(self, buf, encoding=None):
         # don't enumerate() as we only want to count successful deflate streams
@@ -68,3 +69,7 @@ class DeflateDecoder(object):
                 except Exception:
                     # give up
                     pass
+    def validate(self, buf):
+        if len(buf) < self.min_size:
+            raise Exception("Too Small")
+        return buf

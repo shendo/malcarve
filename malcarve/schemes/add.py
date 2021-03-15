@@ -46,6 +46,8 @@ def findadd(buf, pattern, pattern_offset):
     pat = b'(%s)' % b'|'.join(addpats)
     for x in re.finditer(pat, buf[pattern_offset:]):
         i = addpats.index(re.escape(x.group(0))) + 1
+        if i >= 0x80:
+            i += 1
         return {'scheme': 'add',
                'key': bytes([i]),
                'keysize': 1,

@@ -31,7 +31,7 @@ class ChrDecoder(object):
     """
     def __init__(self, name):
         self.name = name
-        self.pattern = re.compile(rb'(Chr\()?\d{1,3}\)?(\s*[\s\-\,\&\|O\%\^\.\;]\s*(Chr\()?\d{1,3}\)?){7,}')
+        self.pattern = re.compile(rb'(Chr\()?\d{1,3}\)?(\s*[\s\-\,\&\|O\%\^\.\;]\s*(Chr\()?\d{1,3}\)?){9,}')
         self.extract = re.compile(rb'(\d{1,3})')
     
     def decode(self, buf, encoding=None):
@@ -55,12 +55,13 @@ class HexDecoder(object):
     def __init__(self, name):
         self.name = name
         # allow separator char like space, comma, %
-        self.pattern = re.compile(rb'([a-fA-F0-9]{2,}[\,\^\%]?\s*){8,}')
+        self.pattern = re.compile(rb'([a-f0-9]{1,}[\,\^\%]?\s*){10,}|([A-F0-9]{2,}[\,\^\%]?\s*){10,}')
 
     def decode(self, buf, encoding=None):
         i = 0
         joined = b''
         first_offset = 0
+        last_offset = 0
         for x in re.finditer(self.pattern, buf):
             try:
                 m = x.group(0).lower() \
@@ -68,9 +69,14 @@ class HexDecoder(object):
                     .replace(b'%', b'') \
                     .replace(b'^', b'')
                 m = re.sub(rb'\s+', b'', m)
-                joined += m
+                if not joined or x.start() - last_offset <= 50:
+                    joined += m
+                else:
+                    joined = m
+                    first_offset = x.start()
                 if not i:
                     first_offset = x.start()
+                last_offset = x.end()
                 i += 1
 
                 if len(m) % 2:
@@ -102,15 +108,22 @@ class B64Decoder(object):
     A stream decoder that will attempt to identify and
     extract any base64 encoded data contained in scanned buffers.
     """
+
+    UPPER = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
     def __init__(self, name):
         self.name = name
-        self.pattern = re.compile(rb'([a-zA-Z0-9+/=]{16,}\s*)+')
+        self.pattern = re.compile(rb'([a-zA-Z0-9+/=]{20,}\s*)+')
 
     def decode(self, buf, encoding=None):
         i = 0
         joined = b''
         first_offset = 0
         for x in re.finditer(self.pattern, buf):
+            # trying to filter out straight hex encoded
+            # all our patterns should result in mix of casing
+            if not any(c in B64Decoder.UPPER for c in x.group(0)[:100]):
+                continue
             try:
                 chunk = re.sub(rb'\s+', b'', x.group(0))
                 rem = len(chunk) % 4
@@ -140,11 +153,11 @@ class B64Decoder(object):
             return
         try:
             joined = base64.decode(joined)
-            yield {'encoding': 'base64',
-                   'stream_id': 0,
-                   'offset': first_offset,
-                   'stream': joined,
-                   }
+            #yield {'encoding': 'base64',
+            #       'stream_id': 0,
+            #       'offset': first_offset,
+            #       'stream': joined,
+            #       }
         except:
             pass
 
@@ -155,7 +168,7 @@ class VariableDecoder(object):
     """
     def __init__(self, name):
         self.name = name
-        self.varpattern = re.compile(rb'([a-zA-Z0-9\s+&=_\[\(\]\)]{2,30}(\"|\')([a-zA-Z0-9+/=]{10,})(\"|\')\s+\;?){2,}')
+        self.varpattern = re.compile(rb'([a-zA-Z0-9\s+&=_\[\(\]\)]{2,30}(\"|\')([a-zA-Z0-9+/=]{16,})(\"|\')\s+\;?){2,}')
         self.stringpattern = re.compile(rb'(\'|\")([a-zA-Z0-9+/=]+)(\'|\")')
 
     def decode(self, buf, encoding=None):
