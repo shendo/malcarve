@@ -37,6 +37,19 @@ Config can be updated by copying malcarve/conf/malcarve.conf to
 ~/.malcarve/malcarve.conf and changing settings as desired.
 
 
+Running from Source
+-------------------
+To run from source code, you will need to manually build the C components too.
+Here is an example (assuming virtualenv) with dependencies for Ubuntu 18.04: ::
+
+        sudo apt-get install build-essential gcc-multilib mingw-w64
+        git clone https://github.com/shendo/malcarve.git
+        cd malcarve/malcarve/ext
+        make
+        cd ../..
+        pip install -e .
+
+
 History
 -------
 
