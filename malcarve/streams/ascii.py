@@ -31,7 +31,7 @@ class ChrDecoder(object):
     """
     def __init__(self, name):
         self.name = name
-        self.pattern = re.compile(rb'(Chr\()?\d{1,3}\)?(\s*[\s\-\,\&\|O\%\^\.\;]\s*(Chr\()?\d{1,3}\)?){9,}')
+        self.pattern = re.compile(rb'(Chr\()?\d{1,3}\)?(\s{,5}[\s\-\,\&\|O\%\^\.\;]\s{,5}(Chr\()?\d{1,3}\)?){9,}')
         self.extract = re.compile(rb'(\d{1,3})')
     
     def decode(self, buf, encoding=None):
