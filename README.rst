@@ -122,7 +122,7 @@ requests can be made using GitHub's `issues system`_.
    :target: https://travis-ci.org/shendo/malcarve
    :alt: Current build status
 
-.. |pypi_version| image:: https://pypip.in/v/malcarve/badge.png
+.. |pypi_version| image:: https://img.shields.io/pypi/v/malcarve
    :target: https://pypi.python.org/pypi/malcarve
    :alt: Latest PyPI version
 
