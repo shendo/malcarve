@@ -1,4 +1,6 @@
 begins
+bottle
+jinja2
 lznt1
 olefile
 progressbar2
